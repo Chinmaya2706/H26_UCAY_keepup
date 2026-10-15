@@ -30,6 +30,251 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
+st.markdown("""
+<style>
+/* ── ANIMATED MOVING BLUE GRADIENT BACKGROUND ── */
+@keyframes oceanGradientFlow {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.stApp, [data-testid="stAppViewContainer"] {
+    background: linear-gradient(
+        -45deg,
+        #020814 0%,
+        #05152e 20%,
+        #0a2852 40%,
+        #0e386e 60%,
+        #082046 80%,
+        #030b1a 100%
+    ) !important;
+    background-size: 350% 350% !important;
+    animation: oceanGradientFlow 18s ease infinite !important;
+    background-attachment: fixed !important;
+}
+
+[data-testid="stAppViewContainer"]::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    background: radial-gradient(circle at 18% 22%, rgba(37, 99, 235, 0.12) 0%, transparent 45%),
+                radial-gradient(circle at 82% 78%, rgba(59, 130, 246, 0.1) 0%, transparent 50%);
+    z-index: 0;
+}
+
+[data-testid="stHeader"] {
+    background: transparent !important;
+}
+
+/* ── MAIN CONTENT GLASS PANEL ── */
+.main .block-container {
+    background: rgba(4, 12, 26, 0.5) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    border-radius: 18px !important;
+    border: 1px solid rgba(59, 130, 246, 0.12) !important;
+    box-shadow: 0 12px 40px -8px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(147, 197, 253, 0.08) !important;
+    padding-top: 2rem !important;
+    padding-bottom: 3rem !important;
+}
+
+/* ── SIDEBAR GLASS PANEL ── */
+[data-testid="stSidebar"] {
+    background: rgba(3, 9, 20, 0.8) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border-right: 1px solid rgba(59, 130, 246, 0.15) !important;
+}
+
+/* ── ALL BUTTONS: BASE & HOVER STATES ── */
+button,
+.stButton > button,
+.stDownloadButton > button,
+[data-testid="baseButton-secondary"],
+[data-testid="baseButton-primary"],
+[data-testid="stBaseButton-secondary"],
+[data-testid="stBaseButton-primary"] {
+    cursor: pointer !important;
+    transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    border-radius: 9px !important;
+    font-weight: 550 !important;
+    letter-spacing: 0.015em !important;
+    position: relative !important;
+    overflow: hidden !important;
+}
+
+/* Standard Secondary & Download Buttons */
+button:not([kind="primary"]):not([data-testid="baseButton-primary"]):not([data-testid="stBaseButton-primary"]),
+.stButton > button:not([kind="primary"]),
+.stDownloadButton > button,
+[data-testid="baseButton-secondary"],
+[data-testid="stBaseButton-secondary"] {
+    background: linear-gradient(145deg, rgba(14, 28, 54, 0.75), rgba(9, 18, 36, 0.85)) !important;
+    border: 1px solid rgba(96, 165, 250, 0.25) !important;
+    color: #e2e8f0 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Standard & Download Button Hover: Lift & Glow */
+button:not([kind="primary"]):not([data-testid="baseButton-primary"]):not([data-testid="stBaseButton-primary"]):hover:not(:disabled),
+.stButton > button:not([kind="primary"]):hover:not(:disabled),
+.stDownloadButton > button:hover:not(:disabled),
+[data-testid="baseButton-secondary"]:hover:not(:disabled),
+[data-testid="stBaseButton-secondary"]:hover:not(:disabled) {
+    transform: translateY(-3px) scale(1.02) !important;
+    background: linear-gradient(145deg, rgba(29, 60, 115, 0.85), rgba(15, 32, 64, 0.95)) !important;
+    border-color: rgba(147, 197, 253, 0.65) !important;
+    box-shadow: 0 8px 25px -4px rgba(37, 99, 235, 0.45), 0 0 16px rgba(59, 130, 246, 0.35) !important;
+    color: #ffffff !important;
+    filter: brightness(1.12) !important;
+}
+
+/* Primary Button (e.g. Analyze Repository) */
+button[kind="primary"],
+[data-testid="baseButton-primary"],
+[data-testid="stBaseButton-primary"],
+.stButton > button[kind="primary"] {
+    background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #3b82f6 100%) !important;
+    border: 1px solid rgba(147, 197, 253, 0.4) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Primary Button Hover: Floating Elevation & Brilliant Cyan-Blue Aura */
+button[kind="primary"]:hover:not(:disabled),
+[data-testid="baseButton-primary"]:hover:not(:disabled),
+[data-testid="stBaseButton-primary"]:hover:not(:disabled),
+.stButton > button[kind="primary"]:hover:not(:disabled) {
+    transform: translateY(-3px) scale(1.02) !important;
+    background: linear-gradient(135deg, #2563eb 0%, #3b82f6 50%, #60a5fa 100%) !important;
+    border-color: rgba(191, 219, 254, 0.85) !important;
+    box-shadow: 0 12px 30px -4px rgba(37, 99, 235, 0.65), 0 0 24px 2px rgba(96, 165, 250, 0.5) !important;
+    filter: brightness(1.15) !important;
+}
+
+/* Active / Pressed State */
+button:active:not(:disabled),
+.stButton > button:active:not(:disabled),
+.stDownloadButton > button:active:not(:disabled) {
+    transform: translateY(0px) scale(0.99) !important;
+    box-shadow: 0 2px 10px rgba(37, 99, 235, 0.3) !important;
+}
+
+/* Disabled State */
+button:disabled,
+.stButton > button:disabled,
+.stDownloadButton > button:disabled {
+    opacity: 0.45 !important;
+    transform: none !important;
+    box-shadow: none !important;
+    cursor: not-allowed !important;
+    filter: none !important;
+}
+
+/* ── TABS WITH SMOOTH HOVER ── */
+[data-baseweb="tab-list"] {
+    background: rgba(6, 16, 32, 0.7) !important;
+    border-radius: 12px !important;
+    padding: 5px !important;
+    border: 1px solid rgba(59, 130, 246, 0.15) !important;
+    gap: 4px !important;
+}
+[data-baseweb="tab"] {
+    border-radius: 8px !important;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    color: #94a3b8 !important;
+    cursor: pointer !important;
+}
+[data-baseweb="tab"]:hover {
+    background: rgba(59, 130, 246, 0.15) !important;
+    color: #bfdbfe !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2) !important;
+}
+[aria-selected="true"][data-baseweb="tab"] {
+    background: rgba(37, 99, 235, 0.28) !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(96, 165, 250, 0.3) !important;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25) !important;
+}
+
+/* ── METRIC CARDS WITH HOVER LIFT ── */
+[data-testid="stMetric"] {
+    background: rgba(6, 17, 36, 0.6) !important;
+    border: 1px solid rgba(59, 130, 246, 0.15) !important;
+    border-radius: 14px !important;
+    padding: 1.1rem 1.3rem !important;
+    backdrop-filter: blur(12px) !important;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+[data-testid="stMetric"]:hover {
+    border-color: rgba(96, 165, 250, 0.4) !important;
+    box-shadow: 0 8px 24px -4px rgba(37, 99, 235, 0.25), 0 0 16px rgba(59, 130, 246, 0.15) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* ── TEXT INPUTS & LABELS ── */
+.stTextInput input {
+    background: rgba(5, 14, 30, 0.75) !important;
+    border: 1px solid rgba(59, 130, 246, 0.2) !important;
+    border-radius: 9px !important;
+    color: #f1f5f9 !important;
+    transition: all 0.2s ease !important;
+}
+.stTextInput input:hover {
+    border-color: rgba(96, 165, 250, 0.4) !important;
+}
+.stTextInput input:focus {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.22), 0 0 18px rgba(59, 130, 246, 0.2) !important;
+}
+
+/* ── EXPANDERS ── */
+[data-testid="stExpander"] {
+    background: rgba(6, 16, 34, 0.5) !important;
+    border: 1px solid rgba(59, 130, 246, 0.12) !important;
+    border-radius: 10px !important;
+    transition: all 0.25s ease !important;
+}
+[data-testid="stExpander"]:hover {
+    border-color: rgba(96, 165, 250, 0.3) !important;
+}
+
+/* ── CHECKBOX ── */
+.stCheckbox label:hover {
+    color: #93c5fd !important;
+    transition: color 0.2s ease !important;
+    cursor: pointer !important;
+}
+
+/* ── MINIMALISTIC TYPOGRAPHY ACCENT ── */
+h1 {
+    background: linear-gradient(135deg, #ffffff 40%, #93c5fd 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.02em !important;
+}
+
+/* ── CUSTOM SCROLLBAR ── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: rgba(3, 9, 20, 0.6); }
+::-webkit-scrollbar-thumb { background: rgba(59, 130, 246, 0.35); border-radius: 5px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(59, 130, 246, 0.65); }
+</style>
+""", unsafe_allow_html=True)
+
 
 def init_session_state():
     """Initialize Streamlit session state variables."""
