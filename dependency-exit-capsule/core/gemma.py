@@ -74,7 +74,7 @@ class GemmaClient:
         api_key: Optional[str] = None,
         model: Optional[str] = None,
         base_url: Optional[str] = None,
-        timeout: int = 45,
+        timeout: int = 120,
     ):
         self.api_key = api_key or os.getenv("GEMMA_API_KEY") or os.getenv("OPENROUTER_API_KEY") or os.getenv("GROQ_API_KEY")
         self.model = model or os.getenv("GEMMA_MODEL", "gemma-4-it")
@@ -110,26 +110,13 @@ class GemmaClient:
         payload_data = self._build_context_payload(repo_source, ecosystem, dependencies, findings)
 
         prompt = (
-            "You are Gemma 4, an expert software architecture and dependency security model. "
-            "Analyze the following repository dependency inventory, observed risks, and source code usage locations.\n"
-            "Distinguish observed evidence from speculation. All recommendations must be actionable suggestions for a maintainer.\n\n"
-            f"REPOSITORY CONTEXT & EVIDENCE:\n{json.dumps(payload_data, indent=2)}\n\n"
-            "Respond ONLY with a valid JSON object matching this exact schema:\n"
-            "{\n"
-            '  "recommendations": [\n'
-            "    {\n"
-            '      "package_name": "<exact name of risky/deprecated package>",\n'
-            '      "replacement_candidate": "<exact replacement package or null>",\n'
-            '      "risk_summary": "<interpretation of observed evidence>",\n'
-            '      "rationale": "<why the replacement is suitable or why package should be removed>",\n'
-            '      "migration_steps": ["<step 1>", "<step 2>"],\n'
-            '      "suggested_tests": ["<test 1>", "<test 2>"],\n'
-            '      "compatibility_concerns": "<API differences or behavioral gotchas>",\n'
-            '      "uncertainty": "<unresolved risks or verification requirements>"\n'
-            "    }\n"
-            "  ],\n"
-            '  "general_guidance": "<high-level summary of repository health and migration sequence>"\n'
-            "}\n"
+            "Analyze these repository dependencies and risks. "
+            "Return ONLY valid JSON (no markdown fences) with this schema:\n"
+            '{"recommendations":[{"package_name":"...","replacement_candidate":"...or null",'
+            '"risk_summary":"...","rationale":"...","migration_steps":["..."],'
+            '"suggested_tests":["..."],"compatibility_concerns":"...","uncertainty":"..."}],'
+            '"general_guidance":"..."}\n\n'
+            f"EVIDENCE:\n{json.dumps(payload_data)}\n"
         )
 
         try:
@@ -165,13 +152,15 @@ class GemmaClient:
         # Focus on dependencies with risks or active usage
         risky_pkgs = {f.package_name.lower() for f in findings}
 
+        # Sort: risky deps first, then others; cap at 10 total to stay within model context
+        sorted_deps = sorted(dependencies, key=lambda d: d.name.lower() not in risky_pkgs)
         dep_summaries = []
-        for dep in dependencies:
+        for dep in sorted_deps[:10]:
             is_risky = dep.name.lower() in risky_pkgs
-            # Bound usage snippets to 3 max per dependency
+            # Bound usage snippets to 1 max per dependency to reduce tokens
             limited_snippets = [
                 f"{u.file_path}:{u.line_number} -> {u.snippet}"
-                for u in dep.usage_locations[:3]
+                for u in dep.usage_locations[:1]
             ]
             dep_summaries.append({
                 "name": dep.name,
@@ -194,11 +183,10 @@ class GemmaClient:
         ]
 
         return {
-            "repository": repo_source,
+            "repo": repo_source,
             "ecosystem": ecosystem,
-            "total_dependencies": len(dependencies),
-            "findings": findings_summary,
-            "dependencies": dep_summaries[:25],  # Capped to avoid huge token bills
+            "findings": findings_summary[:8],  # Only top 8 findings
+            "dependencies": dep_summaries,  # Already capped at 10
         }
 
     def _call_model(self, prompt: str) -> str:

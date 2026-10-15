@@ -6,6 +6,9 @@ from pathlib import Path
 from typing import List, Optional
 
 import streamlit as st
+from dotenv import load_dotenv
+
+load_dotenv(override=True)  # Load .env before any os.getenv() calls
 
 # Ensure repository root is in sys.path
 BASE_DIR = Path(__file__).resolve().parent
